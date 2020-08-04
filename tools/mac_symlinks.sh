@@ -1,2 +1,2 @@
 #!/bin/bash
-ln -l $(pwd)/../libraries/* ~/Documents/Arduino/libraries/
+ln -s $(pwd)/../libraries/* ~/Documents/Arduino/libraries/

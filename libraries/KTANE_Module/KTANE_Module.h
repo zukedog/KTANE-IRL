@@ -22,6 +22,12 @@ class KTANE_Module {
     static bool _validConfig;
     static bool _armed;
 
+    static int _batteries;
+    static bool parallelPort; // Sorry
+    static bool _serialOdd;
+    static bool indicators[11];
+    static unsigned long explosionTime;
+
     static bool newFullConfig;
     static bool newErrorMessage;
     static bool newDebugMessage;
@@ -83,7 +89,11 @@ class KTANE_Module {
     bool port(int);
     bool serialOdd();
     bool serialEven();
-     
+    bool indicator(int);
+
+
+    unsigned long timeTillDetonation();
+
     
 
     //sets

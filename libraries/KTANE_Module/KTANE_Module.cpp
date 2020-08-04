@@ -19,6 +19,13 @@ bool KTANE_Module::_gameMode = false;
 bool KTANE_Module::_validConfig = false;
 bool KTANE_Module::_armed;
 
+int KTANE_Module::_batteries = 0;
+bool KTANE_Module::parallelPort = false; // Sorry
+bool KTANE_Module::_serialOdd = false;
+bool KTANE_Module::indicators[11] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+unsigned long KTANE_Module::explosionTime = 3600000;
+
+
 bool KTANE_Module::newFullConfig = false;
 bool KTANE_Module::newErrorMessage = false;
 bool KTANE_Module::newDebugMessage = false;
@@ -34,12 +41,13 @@ byte KTANE_Module::moduleVersion[3] = {0, 0, 0};
 
 byte KTANE_Module::strikes = 0;
 
-// Wire Stuff
+// Wire i2c Stuff
 
 bool KTANE_Module::sentSize = false;
 
 
 byte KTANE_Module::masterRequestValue;
+
 
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
@@ -217,6 +225,35 @@ bool KTANE_Module::armed() {
 }
 bool KTANE_Module::configValid() {
   return _validConfig;
+}
+
+int KTANE_Module::batteries(){
+  return _batteries;
+}
+
+bool KTANE_Module::port(int index){
+  return parallelPort;
+}
+
+bool KTANE_Module::port(){
+  port(1);
+}
+
+bool KTANE_Module::serialOdd(){
+  return _serialOdd;
+}
+
+bool KTANE_Module::serialEven(){
+  return !serialOdd();
+}
+
+bool KTANE_Module::indicator(int index){
+  return indicators[index]; 
+}
+
+
+unsigned long KTANE_Module::timeTillDetonation(){
+  return explosionTime - millis(); 
 }
 
 //sets
