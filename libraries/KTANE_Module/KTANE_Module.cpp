@@ -7,6 +7,19 @@
 
 #include "KTANE_Module.h"
 #include <Wire.h>
+#define KTANE_INDICATOR_SND 0
+#define KTANE_INDICATOR_CLR 1
+#define KTANE_INDICATOR_CAR 2
+#define KTANE_INDICATOR_IND 3
+#define KTANE_INDICATOR_FRQ 4
+#define KTANE_INDICATOR_SIG 5
+#define KTANE_INDICATOR_NSA 6
+#define KTANE_INDICATOR_MSA 7
+#define KTANE_INDICATOR_TRN 8
+#define KTANE_INDICATOR_BOB 9
+#define KTANE_INDICATOR_FRK 10
+
+
 bool (*KTANE_Module::user_onArm)(void);
 void (*KTANE_Module::user_onReset)(void);
 void (*KTANE_Module::user_onExplode)(void);
