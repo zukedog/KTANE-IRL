@@ -13,20 +13,28 @@ class KTANE_Controller_Communication {
   private:
   public:
     // Get Functions
-    byte getStatus(int);
-    int getStrikes(int);
-    String getFullConfig(int);
-    String getErrorMessage(int);
-    String getDebugMessage(int);
-    String getModuleName(int);
-    int[] getModuleVersion(int);
+    byte receiveStatus(int);
+    int receiveStrikes(int);
+    String receiveFullConfig(int);
+    String receiveErrorMessage(int);
+    String receiveDebugMessage(int);
+    String receiveModuleName(int);
+    int[] receiveModuleVersion(int);
     
     // Set Functions
-    void setBatteries(int, int);
-    void setParallelPort(int, bool);
-    void setSerialOdd(int, bool);
-    void setIndicators(int, bool[11]);
-    void setTimeTillExplosion(int, unsigned long);
+    void sendBatteries(int, int);
+    void sendParallelPort(int, bool);
+    void sendSerialOdd(int, bool);
+    void sendIndicators(int, bool[11]);
+    void sendTimeTillExplosion(int, unsigned long);
+    // send all?
+    // data preferences?
+    
+    // Actions
+    void arm(int);
+    void reset(int);
+    void explode(int);
+    void win(int);
 
 
 };

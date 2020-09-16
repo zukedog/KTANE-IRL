@@ -23,7 +23,7 @@ class KTANE_Controller_Module {
     int[3] moduleVersion;
 
   public:
-    // update Functions
+    // Get Functions
     bool getGameMode();
     bool getArmed();
     bool getValidConfig();
@@ -31,6 +31,10 @@ class KTANE_Controller_Module {
     String getErrorMessage();
     String getDebugMessage();
     int getStrikes();
+
+    // Update Functions
+    void updateStatus();
+    void updateStatus;
     
 };
 
