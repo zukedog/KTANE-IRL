@@ -12,6 +12,23 @@
 class KTANE_Controller_Communication {
   private:
   public:
+    // Get Functions
+    byte getStatus(int);
+    int getStrikes(int);
+    String getFullConfig(int);
+    String getErrorMessage(int);
+    String getDebugMessage(int);
+    String getModuleName(int);
+    int[] getModuleVersion(int);
+    
+    // Set Functions
+    void setBatteries(int, int);
+    void setParallelPort(int, bool);
+    void setSerialOdd(int, bool);
+    void setIndicators(int, bool[11]);
+    void setTimeTillExplosion(int, unsigned long);
+
+
 };
 
 #endif

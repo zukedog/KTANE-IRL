@@ -10,7 +10,28 @@
 #include "KTANE_Controller_Communication.h"
 class KTANE_Controller_Module {
   private:
+    // Module Identity
+    int address;
+
+    // Module State
+    byte status;
+    int strikes;
+    String fullConfig;
+    String errorMessage;
+    String debugMessage;
+    String moduleName;
+    int[3] moduleVersion;
+
   public:
+    // update Functions
+    bool getGameMode();
+    bool getArmed();
+    bool getValidConfig();
+    String getConfig();
+    String getErrorMessage();
+    String getDebugMessage();
+    int getStrikes();
+    
 };
 
 #endif
