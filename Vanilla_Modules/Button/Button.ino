@@ -1,6 +1,10 @@
 #include <KTANE_Module.h>
+#include <Adafruit_NeoPixel.h>
+
+int LED_PIN=9;
 
 KTANE_Module KTANE = KTANE_Module();
+Adafruit_NeoPixel strip(3, LED_PIN, NEO_RGB + NEO_KHZ800);
 
 //defuse variables
 bool HOLD=false;
@@ -11,7 +15,7 @@ const int led=4;
 const int push=7;
 
 //threshold for push and relese
-const int threshold=100;
+const int threshold=500;
 
 unsigned long start;
 
@@ -33,6 +37,10 @@ void setup() {
 
   KTANE.begin("Button",0,0,1);
   KTANE.onArm(detectButton);
+
+  strip.begin();
+
+  randomSeed(analogRead(1));
 }
 
 void loop() {
@@ -58,7 +66,7 @@ bool detectButton(){
     KTANE.debugln("hold");
     //pick colour for the lit indicator
     String temp[]={"1","4","5"};
-    Release=temp[random(0,2)];
+    Release=temp[random(0,3)];
   }
   return true;
 }
@@ -66,19 +74,27 @@ bool detectButton(){
 bool ifPress(String timing, bool mode){
   if(!digitalRead(push)){
     start=millis();
+
+    for (int i=0;i<3;i++){
+      strip.setPixelColor(i, strip.Color(colours[Release.toInt()][0], colours[Release.toInt()][1], colours[Release.toInt()][2]));
+    }
     
     while(!digitalRead(push)){
-      if ((millis()-start>5000) || (millis()-start<6000)){
-        //show indicator strip
+      if ((millis()-start)>500 && (millis()-start)<510){
+        strip.show();
       }
       delay(1);
     }
+
+    for (int i=0;i<3;i++){
+      strip.setPixelColor(i, strip.Color(0,0,0));
+    }
+    strip.show();
     
     //calculate numbers in time (miliseconds to dentination)to find the exact symbols that are on the clock
     unsigned long Time= KTANE.timeTillDetonation()/1000;
     
     String symbols=(String)(Time/60);//get minutes
-    
     symbols+=(String)(Time%60);//get seconds
 
     //if there is a number in the time (and it is press and hold) or it is within the threshold (press and relese)
@@ -86,6 +102,6 @@ bool ifPress(String timing, bool mode){
       KTANE.disarm();
     }else{
       KTANE.strike(); 
-    }       
+    }      
   }
 }
