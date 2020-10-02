@@ -1,10 +1,11 @@
 #include <Wire.h>
-#include <KTANE_Controller_Communication.h>
-KTANE_Controller_Commumication ktaneCC = KTANE_Controller_Communication();
+#include <KTANE_Controller.h>
+
 String inputString = "";         // a String to hold incoming data
 bool stringComplete = false;  // whether the string is complete
 
 void setup() {
+  Wire.begin(); // join i2c bus (address optional for master)
   Serial.begin(2000000);  // start serial for output
 
   // reserve 200 bytes for the inputString:
@@ -14,6 +15,14 @@ void setup() {
 byte x = 0;
 
 
+byte getStatus() {
+  Wire.beginTransmission(8);
+  Wire.write(0);
+  Wire.endTransmission();
+  Wire.requestFrom(8, 1);
+  byte stat = Wire.read();
+  return stat;
+}
 
 void getConfig() {
   Wire.beginTransmission(8);
@@ -99,7 +108,7 @@ byte status;
 byte oldStatus;
 
 void loop() {
-  status = ktaneCC.receiveStatus(8);
+  status = getStatus();
   if (status != B11111111) {
     if (status != oldStatus) {
       Serial.println("NEW STATUS RECEIVED");
@@ -158,7 +167,7 @@ void loop() {
     }
 
     if (inputString == "getStatus\n") {
-      Serial.println(ktaneCC.receiveStatus(8), BIN);
+      Serial.println(getStatus(), BIN);
     }
 
     if (inputString == "getConfig\n") {

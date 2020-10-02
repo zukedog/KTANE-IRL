@@ -1,5 +1,5 @@
 /*
-  KTANE_Controller_Communication.h - Library for storing module data on the controller module\
+  KTANE_Controller_Communication.h - Helper class for getting moudule data from the controller module\
   for JustinCase and Zukedog2000's Keep Talking and Nobody Explodes project.
   Created by Zukedog2000, June 2020.
 */
@@ -12,14 +12,23 @@
 class KTANE_Controller_Communication {
   private:
   public:
+    // Functions
+    void begin();
+    void arm(int);
+    void reset(int);
+    void explode(int);
+    void win(int);
+
     // Get Functions
+    byte receiveNeededInfo(int);
+
     byte receiveStatus(int);
     int receiveStrikes(int);
     String receiveFullConfig(int);
     String receiveErrorMessage(int);
     String receiveDebugMessage(int);
     String receiveModuleName(int);
-    int[] receiveModuleVersion(int);
+    String receiveModuleVersion(int);
     
     // Set Functions
     void sendBatteries(int, int);
@@ -30,12 +39,6 @@ class KTANE_Controller_Communication {
     // send all?
     // data preferences?
     
-    // Actions
-    void arm(int);
-    void reset(int);
-    void explode(int);
-    void win(int);
-
 
 };
 

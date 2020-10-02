@@ -1,11 +1,13 @@
 #include <Wire.h>
 #include <KTANE_Controller_Communication.h>
-KTANE_Controller_Commumication ktaneCC = KTANE_Controller_Communication();
+
+KTANE_Controller_Communication ktaneCC = KTANE_Controller_Communication();
 String inputString = "";         // a String to hold incoming data
 bool stringComplete = false;  // whether the string is complete
 
 void setup() {
   Serial.begin(2000000);  // start serial for output
+  ktaneCC.begin();
 
   // reserve 200 bytes for the inputString:
   inputString.reserve(10);
