@@ -35,6 +35,7 @@ bool KTANE_Module::_armed;
 int KTANE_Module::_batteries = 0;
 bool KTANE_Module::parallelPort = false; // Sorry
 bool KTANE_Module::_serialOdd = false;
+bool KTANE_Module::_serialVowel = false;
 bool KTANE_Module::indicators[11] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 unsigned long KTANE_Module::explosionTime = 3600000;
 
@@ -260,6 +261,10 @@ bool KTANE_Module::serialEven(){
   return !serialOdd();
 }
 
+bool KTANE_Module::serialVowel(){
+  return _serialVowel;
+}
+
 bool KTANE_Module::indicator(int index){
   return indicators[index]; 
 }
@@ -267,6 +272,11 @@ bool KTANE_Module::indicator(int index){
 
 unsigned long KTANE_Module::timeTillDetonation(){
   return explosionTime - millis(); 
+}
+
+int KTANE_Module::getStrikes(){
+  return 0;
+
 }
 
 //sets

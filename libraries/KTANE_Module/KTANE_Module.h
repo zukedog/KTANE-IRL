@@ -25,6 +25,7 @@ class KTANE_Module {
     static int _batteries;
     static bool parallelPort; // Sorry
     static bool _serialOdd;
+    static bool _serialVowel;
     static bool indicators[11];
     static unsigned long explosionTime;
 
@@ -89,7 +90,10 @@ class KTANE_Module {
     bool port(int);
     bool serialOdd();
     bool serialEven();
+    bool serialVowel();
     bool indicator(int);
+
+    bool getStrikes();
 
 
     unsigned long timeTillDetonation();
