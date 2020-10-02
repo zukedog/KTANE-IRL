@@ -136,9 +136,7 @@ void loop() {
 
   if (stringComplete) {
     if (inputString == "arm\n") {
-      Wire.beginTransmission(8); // transmit to device #8
-      Wire.write(20);
-      Wire.endTransmission();    // stop transmitting
+      ktaneCC.arm(8);
     }
 
     if (inputString == "reset\n") {

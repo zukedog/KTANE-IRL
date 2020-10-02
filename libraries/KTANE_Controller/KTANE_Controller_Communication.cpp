@@ -7,12 +7,21 @@
 #include <Wire.h>
 #include <KTANE_Controller_Communication.h>
 
+//Helper functions
+
+void KTANE_Controller_Communication::send(int module, byte value){
+  Wire.beginTransmission(module);
+  Wire.write(value);
+  Wire.endTransmission();
+}
+
 // Functions
 void KTANE_Controller_Communication::begin(){
   Wire.begin(); // join i2c bus (address optional for master)
 }
 
 void KTANE_Controller_Communication::arm(int module){
+  send(module, 20);
 }
 
 void KTANE_Controller_Communication::reset(int module){

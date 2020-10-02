@@ -11,6 +11,7 @@
 
 class KTANE_Controller_Communication {
   private:
+    void send(int, byte);
   public:
     // Functions
     void begin();
