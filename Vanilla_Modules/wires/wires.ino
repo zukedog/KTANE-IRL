@@ -1,4 +1,4 @@
-#include "KTANE_Slave.h"
+#include "KTANE_Module.h"
 
 #define VIN 5
 #define BLUE 0
@@ -27,7 +27,7 @@ bool serialOdd=true;
 const int analogControlPins[] = {5, 6, 7};
 const int analogControlPinCount = 3;
 
-KTANE_Slave KTANE = KTANE_Slave();
+KTANE_Module KTANE = KTANE_Module();
 
 void setup() {
   Serial.begin(9600);
