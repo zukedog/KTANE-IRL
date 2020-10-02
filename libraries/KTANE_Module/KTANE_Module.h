@@ -93,7 +93,7 @@ class KTANE_Module {
     bool serialVowel();
     bool indicator(int);
 
-    bool getStrikes();
+    int getStrikes();
 
 
     unsigned long timeTillDetonation();
