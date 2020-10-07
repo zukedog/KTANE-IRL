@@ -17,6 +17,7 @@ class KTANE_Controller_Module {
 
     // Module State
     byte status;
+    byte lastStatus;
     int strikes;
     String fullConfig;
     String errorMessage;
@@ -24,10 +25,22 @@ class KTANE_Controller_Module {
     String moduleName;
     int moduleVersion[3];
 
+    bool debugOnController;
+    bool errorOnController;
+    bool newConfigOnController;
+    bool newStrikesOnController;
+    bool newStatusOnController;
+
     byte neededInfo;
     // Document this later (Bits represent want for TBPS)
+    bool debugOnModule();
+    bool errorOnModule();
+    bool newConfigOnModule();
+    bool newStrikesOnModule();
 
   public:
+    // Constructor
+    void begin(int);
     // Get Functions
     bool getGameMode();
     bool getArmed();
@@ -36,6 +49,13 @@ class KTANE_Controller_Module {
     String getErrorMessage();
     String getDebugMessage();
     int getStrikes();
+
+    bool newConfigAvailable();
+    bool newErrorAvailable();
+    bool newDebugAvailable();
+    bool newStrikesAvailable();
+
+    bool newStatusAvailable();
 
     bool getWantBatteries();
     bool getWantParallelPort();

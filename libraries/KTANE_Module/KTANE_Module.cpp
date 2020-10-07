@@ -143,6 +143,7 @@ void KTANE_Module::sendErrorToMaster() {
 
 void KTANE_Module::sendStrikesToMaster() {
   Wire.write(strikes);
+  strikes = 0;
   hasStrike = false;
 }
 

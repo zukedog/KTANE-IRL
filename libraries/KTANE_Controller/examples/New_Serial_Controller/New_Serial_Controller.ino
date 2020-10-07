@@ -1,160 +1,63 @@
 #include <Wire.h>
 #include <KTANE_Controller_Communication.h>
+#include <KTANE_Controller_Module.h>
 
-KTANE_Controller_Communication ktaneCC = KTANE_Controller_Communication();
+KTANE_Controller_Module module;
 String inputString = "";         // a String to hold incoming data
 bool stringComplete = false;  // whether the string is complete
 
 void setup() {
   Serial.begin(2000000);  // start serial for output
   ktaneCC.begin();
+  module.begin(8);
 
   // reserve 200 bytes for the inputString:
   inputString.reserve(10);
 }
 
-byte x = 0;
 
-
-
-void getConfig() {
-  Wire.beginTransmission(8);
-  Wire.write(1);
-  Wire.endTransmission();
-  Wire.requestFrom(8, 1);
-  byte size = Wire.read();
-
-  Wire.requestFrom(8, size);    // request 6 bytes from slave device #8
-  while (Wire.available()) { // slave may send less than requested
-    char c = Wire.read(); // receive a byte as character
-    Serial.print(c);         // print the character
-  }
-  Serial.println();
-}
-
-void getError() {
-  Wire.beginTransmission(8);
-  Wire.write(2);
-  Wire.endTransmission();
-  Wire.requestFrom(8, 1);
-  byte size = Wire.read();
-  Wire.requestFrom(8, size);    // request 6 bytes from slave device #8
-  while (Wire.available()) { // slave may send less than requested
-    char c = Wire.read(); // receive a byte as character
-    Serial.print(c);         // print the character
-  }
-  Serial.println();
-}
-
-void getDebug() {
-  Wire.beginTransmission(8);
-  Wire.write(3);
-  Wire.endTransmission();
-  Wire.requestFrom(8, 1);
-  byte size = Wire.read();
-  Wire.requestFrom(8, size);    // request 6 bytes from slave device #8
-  while (Wire.available()) { // slave may send less than requested
-    char c = Wire.read(); // receive a byte as character
-    Serial.print(c);         // print the character
-  }
-  //Serial.println();
-}
-
-void getStrikes() {
-  Wire.beginTransmission(8);
-  Wire.write(4);
-  Wire.endTransmission();
-  Wire.requestFrom(8, 1);
-  byte strikes = Wire.read();
-  Serial.println(strikes);
-}
-
-void getName() {
-  Wire.beginTransmission(8);
-  Wire.write(5);
-  Wire.endTransmission();
-  Wire.requestFrom(8, 1);
-  byte size = Wire.read();
-  Wire.requestFrom(8, size);    // request 6 bytes from slave device #8
-  while (Wire.available()) { // slave may send less than requested
-    char c = Wire.read(); // receive a byte as character
-    Serial.print(c);         // print the character
-  }
-  Serial.println();
-}
-
-void getVersion() {
-  Wire.beginTransmission(8);
-  Wire.write(6);
-  Wire.endTransmission();
-  Wire.requestFrom(8, 3);
-  while (Wire.available()) { // slave may send less than requested
-    int i = Wire.read(); // receive a byte as character
-    Serial.print(i);         // print the character
-    Serial.print(".");
-  }
-  Serial.println();
-}
-
-
-byte status;
-byte oldStatus;
 
 void loop() {
-  status = ktaneCC.receiveStatus(8);
-  if (status != B11111111) {
-    if (status != oldStatus) {
-      Serial.println("NEW STATUS RECEIVED");
-      Serial.print("GM: ");
-      Serial.print((status & B10000000) > 0);
-      Serial.print(", VC/A: ");
-      Serial.print((status & B01000000) > 0);
-      Serial.print(", NFC: ");
-      Serial.print((status & B00100000) > 0);
-      Serial.print(", ERR: ");
-      Serial.print((status & B00010000) > 0);
-      Serial.print(", DBG: ");
-      Serial.print((status & B00001000) > 0);
-      Serial.print(", STR: ");
-      Serial.print((status & B00000100) > 0);
-      Serial.print(", WGS: ");
-      Serial.print((status & B00000010) > 0);
-      Serial.print(", ???: ");
-      Serial.println((status & B00000001) > 0);
-      oldStatus = status;
-      Serial.println("--------------------------------------------------------------");
-    }
-    if (status & B00001000) {
-      Serial.print("DEBUG: ");
-      getDebug();
-      Serial.println("--------------------------------------------------------------");
-    }
+  //Serial.println("loop");
+  //delay(1000);
+  module.updateStateAndStatus();
+
+  if (module.newStatusAvailable() || module.newStrikesAvailable()) {
+    Serial.println("NEW STATUS RECEIVED");
+    Serial.print("GM: ");
+    Serial.print(module.getGameMode());
+    Serial.print(", VC/A: ");
+    Serial.print(module.getValidConfig());
+    Serial.print(", STR: ");
+    Serial.println(module.getStrikes());
+    Serial.println("--------------------------------------------------------------");
+
+
   }
 
+  if (module.newDebugAvailable()) {
+    Serial.print("DEBUG: ");
+    Serial.println(module.getDebugMessage());
+    Serial.println("--------------------------------------------------------------");
+  }
 
 
 
   if (stringComplete) {
     if (inputString == "arm\n") {
-      ktaneCC.arm(8);
+      module.arm();
     }
 
     if (inputString == "reset\n") {
-      Wire.beginTransmission(8); // transmit to device #8
-      Wire.write(21);
-      Wire.endTransmission();    // stop transmitting
+      module.reset();
     }
 
     if (inputString == "explode\n") {
-      Wire.beginTransmission(8); // transmit to device #8
-      Wire.write(22);
-      Wire.endTransmission();    // stop transmitting
+      module.explode();
     }
 
     if (inputString == "win\n") {
-      Wire.beginTransmission(8); // transmit to device #8
-      Wire.write(23);
-      Wire.endTransmission();    // stop transmitting
+      module.win();
     }
 
     if (inputString == "getStatus\n") {
@@ -162,33 +65,35 @@ void loop() {
     }
 
     if (inputString == "getConfig\n") {
-      getConfig();
+      Serial.println(ktaneCC.receiveFullConfig(8));
     }
 
     if (inputString == "getError\n") {
-      getError();
+      Serial.println(ktaneCC.receiveErrorMessage(8));
     }
 
     if (inputString == "getDebug\n") {
-      getDebug();
+      Serial.println(ktaneCC.receiveDebugMessage(8));
     }
 
     if (inputString == "getStrikes\n") {
-      getStrikes();
+      Serial.println(ktaneCC.receiveStrikes(8));
     }
 
     if (inputString == "getName\n") {
-      getName();
+      Serial.println(ktaneCC.receiveModuleName(8));
     }
 
     if (inputString == "getVersion\n") {
-      getVersion();
+      Serial.println(ktaneCC.receiveModuleVersion(8));
     }
 
     // clear the string:
     inputString = "";
     stringComplete = false;
   }
+
+
 
 }
 

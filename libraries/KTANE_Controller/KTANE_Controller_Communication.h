@@ -11,36 +11,38 @@
 
 class KTANE_Controller_Communication {
   private:
-    void send(int, byte);
+    static void send(int, byte);
+    static String receiveUnknownSize(int);
   public:
     // Functions
-    void begin();
-    void arm(int);
-    void reset(int);
-    void explode(int);
-    void win(int);
+    static void begin();
+    static void arm(int);
+    static void reset(int);
+    static void explode(int);
+    static void win(int);
 
     // Get Functions
-    byte receiveNeededInfo(int);
+    static byte receiveNeededInfo(int);
 
-    byte receiveStatus(int);
-    int receiveStrikes(int);
-    String receiveFullConfig(int);
-    String receiveErrorMessage(int);
-    String receiveDebugMessage(int);
-    String receiveModuleName(int);
-    String receiveModuleVersion(int);
+    static byte receiveStatus(int);
+    static int receiveStrikes(int);
+    static String receiveFullConfig(int);
+    static String receiveErrorMessage(int);
+    static String receiveDebugMessage(int);
+    static String receiveModuleName(int);
+    static String receiveModuleVersion(int);
     
     // Set Functions
-    void sendBatteries(int, int);
-    void sendParallelPort(int, bool);
-    void sendSerialOdd(int, bool);
-    void sendIndicators(int, bool[11]);
-    void sendTimeTillExplosion(int, unsigned long);
+    static void sendBatteries(int, int);
+    static void sendParallelPort(int, bool);
+    static void sendSerialOdd(int, bool);
+    static void sendIndicators(int, bool[11]);
+    static void sendTimeTillExplosion(int, unsigned long);
     // send all?
     // data preferences?
     
 
 };
+extern KTANE_Controller_Communication ktaneCC;
 
 #endif
