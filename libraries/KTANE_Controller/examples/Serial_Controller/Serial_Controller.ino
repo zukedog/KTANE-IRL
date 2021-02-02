@@ -1,31 +1,39 @@
 #include <Wire.h>
 #include <KTANE_Controller_Communication.h>
 #include <KTANE_Controller_Module.h>
-
-bool connection = false;
-KTANE_Controller_Module module;
+#define moduleCount 12
+bool connection[moduleCount];
+//KTANE_Controller_Module module;
+KTANE_Controller_Module modules[moduleCount];
 String inputString = "";         // a String to hold incoming data
 bool stringComplete = false;  // whether the string is complete
 const int address = 8;
+String brk = "--------------------------------------------------------------";
 void setup() {
   Serial.begin(2000000);  // start serial for output
   ktaneCC.begin();
-  module.begin(address);
+  //module.begin(address);
+  for (int i = 0; i < moduleCount; i++) {
+    connection[i] = false;
+    modules[i].begin(i + 10);
+  }
+
+
 
   // reserve 200 bytes for the inputString:
   inputString.reserve(10);
 }
 
 
-void printStatus(){
-    Serial.println("MODULE STATUS:");
-    Serial.print("GM: ");
-    Serial.print(module.getGameMode());
-    Serial.print(", VC/A: ");
-    Serial.print(module.getValidConfig());
-    Serial.print(", STR: ");
-    Serial.println(module.getStrikes());
-    Serial.println("--------------------------------------------------------------");
+void printStatus(int moduleNum) {
+  Serial.println("MODULE " +  String(moduleNum) + " STATUS:");
+  Serial.print("GM: ");
+  Serial.print(modules[moduleNum].getGameMode());
+  Serial.print(", VC/A: ");
+  Serial.print(modules[moduleNum].getValidConfig());
+  Serial.print(", STR: ");
+  Serial.println(modules[moduleNum].getStrikes());
+  Serial.println(brk);
 
 }
 
@@ -33,48 +41,61 @@ void printStatus(){
 void loop() {
   //Serial.println("loop");
   //delay(1000);
-  module.updateStateAndStatus();
+  for (int i = 0; i < moduleCount; i++) {
+    modules[i].updateStateAndStatus();
 
-  if(module.getResponding() != connection){
-    connection = module.getResponding();
-    if(connection){
-      Serial.println("Connected to Module");
-      Serial.println("--------------------------------------------------------------");
-      printStatus();
-    }else{
-      Serial.println("Disconected from Module");
-      Serial.println("--------------------------------------------------------------");
+    if (modules[i].getResponding() != connection[i]) {
+      connection[i] = modules[i].getResponding();
+      if (connection[i]) {
+        
+        Serial.print("Connected to Module ");
+        Serial.println(String(i));
+        Serial.println(brk);
+        printStatus(i);
+      } else {
+        Serial.print("Disconected from Module ");
+        Serial.println(String(i));
+        Serial.println(brk);
 
+      }
     }
-  }
 
-  if (module.newStatusAvailable() || module.newStrikesAvailable()) {
-    printStatus();
-  }
+    if (modules[i].newStatusAvailable() || modules[i].newStrikesAvailable()) {
+      printStatus(i);
+    }
 
-  if (module.newDebugAvailable()) {
-    Serial.print("DEBUG: ");
-    Serial.println(module.getDebugMessage());
-    Serial.println("--------------------------------------------------------------");
+    if (modules[i].newDebugAvailable()) {
+      Serial.print("DEBUG FROM " + String(i) + ": ");
+      Serial.println(modules[i].getDebugMessage());
+      Serial.println(brk);
+    }
   }
 
 
 
   if (stringComplete) {
     if (inputString == "arm\n") {
-      module.arm();
+      for (int i = 0; i < moduleCount; i++) {
+        modules[i].arm();
+      }
     }
 
     if (inputString == "reset\n") {
-      module.reset();
+      for (int i = 0; i < moduleCount; i++) {
+        modules[i].reset();
+      }
     }
 
     if (inputString == "explode\n") {
-      module.explode();
+      for (int i = 0; i < moduleCount; i++) {
+        modules[i].explode();
+      }
     }
 
     if (inputString == "win\n") {
-      module.win();
+      for (int i = 0; i < moduleCount; i++) {
+        modules[i].win();
+      }
     }
 
     if (inputString == "getStatus\n") {

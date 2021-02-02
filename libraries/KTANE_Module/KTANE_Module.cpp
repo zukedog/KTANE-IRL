@@ -199,7 +199,18 @@ void KTANE_Module::begin(String moduleName, byte versionBreaking, byte versionFe
   moduleVersion[2] = versionBugfix;
 
   //Wire stuff
-  Wire.begin(8);                // join i2c bus with address #8
+  int address = (analogRead(6)+47)/93;
+  bool different = false;
+  for (int i=0; i <= 40; i++){
+    if(address != (analogRead(6)+47)/93){
+      different = true;
+    }
+  }
+  if(different){
+    Wire.begin(8);                // join i2c bus with address #8
+  }else{
+    Wire.begin(address+10);
+  }
   Wire.onRequest(requestEvent); // register event
   Wire.onReceive(receiveEvent); // register event
 
