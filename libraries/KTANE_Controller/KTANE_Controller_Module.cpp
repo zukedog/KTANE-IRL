@@ -44,7 +44,7 @@ void KTANE_Controller_Module::begin(int address){
   this->address = address;
   responding = false;
   initialised = false;
-  status = B11111111;
+  status = B00000001;
   strikes = 0;
   fullConfig = "No Module Attatched";
   errorMessage = "";
@@ -63,6 +63,16 @@ void KTANE_Controller_Module::begin(int address){
 }
 
 // Get Functions
+
+bool KTANE_Controller_Module::getResponding(){
+  return responding;
+}
+
+bool KTANE_Controller_Module::getInitialised(){
+  return initialised;
+}
+
+
 bool KTANE_Controller_Module::getGameMode(){
   newStatusOnController = false;
   return status&B10000000;
@@ -139,7 +149,15 @@ int KTANE_Controller_Module::getAddress(){
 // Update Functions
 void KTANE_Controller_Module::updateStatus(){
   lastStatus = status;
-  status = ktaneCC.receiveStatus(address);
+  newStatus = ktaneCC.receiveStatus(address);
+  if (newStatus & B00000001){ // This probably means there is no module or it has been reset
+    responding = false;
+    initialised = false;
+    return;
+  } else{
+    responding = true;
+  }
+  status = newStatus;
   if ((status & B11000000) != (lastStatus & B11000000)){
     newStatusOnController = true;
   }

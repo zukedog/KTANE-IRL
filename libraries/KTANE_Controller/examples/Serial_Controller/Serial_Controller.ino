@@ -1,194 +1,116 @@
 #include <Wire.h>
 #include <KTANE_Controller_Communication.h>
-KTANE_Controller_Commumication ktaneCC = KTANE_Controller_Communication();
+#include <KTANE_Controller_Module.h>
+
+bool connection = false;
+KTANE_Controller_Module module;
 String inputString = "";         // a String to hold incoming data
 bool stringComplete = false;  // whether the string is complete
-
+const int address = 8;
 void setup() {
   Serial.begin(2000000);  // start serial for output
+  ktaneCC.begin();
+  module.begin(address);
 
   // reserve 200 bytes for the inputString:
   inputString.reserve(10);
 }
 
-byte x = 0;
 
+void printStatus(){
+    Serial.println("MODULE STATUS:");
+    Serial.print("GM: ");
+    Serial.print(module.getGameMode());
+    Serial.print(", VC/A: ");
+    Serial.print(module.getValidConfig());
+    Serial.print(", STR: ");
+    Serial.println(module.getStrikes());
+    Serial.println("--------------------------------------------------------------");
 
-
-void getConfig() {
-  Wire.beginTransmission(8);
-  Wire.write(1);
-  Wire.endTransmission();
-  Wire.requestFrom(8, 1);
-  byte size = Wire.read();
-
-  Wire.requestFrom(8, size);    // request 6 bytes from slave device #8
-  while (Wire.available()) { // slave may send less than requested
-    char c = Wire.read(); // receive a byte as character
-    Serial.print(c);         // print the character
-  }
-  Serial.println();
 }
 
-void getError() {
-  Wire.beginTransmission(8);
-  Wire.write(2);
-  Wire.endTransmission();
-  Wire.requestFrom(8, 1);
-  byte size = Wire.read();
-  Wire.requestFrom(8, size);    // request 6 bytes from slave device #8
-  while (Wire.available()) { // slave may send less than requested
-    char c = Wire.read(); // receive a byte as character
-    Serial.print(c);         // print the character
-  }
-  Serial.println();
-}
-
-void getDebug() {
-  Wire.beginTransmission(8);
-  Wire.write(3);
-  Wire.endTransmission();
-  Wire.requestFrom(8, 1);
-  byte size = Wire.read();
-  Wire.requestFrom(8, size);    // request 6 bytes from slave device #8
-  while (Wire.available()) { // slave may send less than requested
-    char c = Wire.read(); // receive a byte as character
-    Serial.print(c);         // print the character
-  }
-  //Serial.println();
-}
-
-void getStrikes() {
-  Wire.beginTransmission(8);
-  Wire.write(4);
-  Wire.endTransmission();
-  Wire.requestFrom(8, 1);
-  byte strikes = Wire.read();
-  Serial.println(strikes);
-}
-
-void getName() {
-  Wire.beginTransmission(8);
-  Wire.write(5);
-  Wire.endTransmission();
-  Wire.requestFrom(8, 1);
-  byte size = Wire.read();
-  Wire.requestFrom(8, size);    // request 6 bytes from slave device #8
-  while (Wire.available()) { // slave may send less than requested
-    char c = Wire.read(); // receive a byte as character
-    Serial.print(c);         // print the character
-  }
-  Serial.println();
-}
-
-void getVersion() {
-  Wire.beginTransmission(8);
-  Wire.write(6);
-  Wire.endTransmission();
-  Wire.requestFrom(8, 3);
-  while (Wire.available()) { // slave may send less than requested
-    int i = Wire.read(); // receive a byte as character
-    Serial.print(i);         // print the character
-    Serial.print(".");
-  }
-  Serial.println();
-}
-
-
-byte status;
-byte oldStatus;
 
 void loop() {
-  status = ktaneCC.receiveStatus(8);
-  if (status != B11111111) {
-    if (status != oldStatus) {
-      Serial.println("NEW STATUS RECEIVED");
-      Serial.print("GM: ");
-      Serial.print((status & B10000000) > 0);
-      Serial.print(", VC/A: ");
-      Serial.print((status & B01000000) > 0);
-      Serial.print(", NFC: ");
-      Serial.print((status & B00100000) > 0);
-      Serial.print(", ERR: ");
-      Serial.print((status & B00010000) > 0);
-      Serial.print(", DBG: ");
-      Serial.print((status & B00001000) > 0);
-      Serial.print(", STR: ");
-      Serial.print((status & B00000100) > 0);
-      Serial.print(", WGS: ");
-      Serial.print((status & B00000010) > 0);
-      Serial.print(", ???: ");
-      Serial.println((status & B00000001) > 0);
-      oldStatus = status;
+  //Serial.println("loop");
+  //delay(1000);
+  module.updateStateAndStatus();
+
+  if(module.getResponding() != connection){
+    connection = module.getResponding();
+    if(connection){
+      Serial.println("Connected to Module");
       Serial.println("--------------------------------------------------------------");
-    }
-    if (status & B00001000) {
-      Serial.print("DEBUG: ");
-      getDebug();
+      printStatus();
+    }else{
+      Serial.println("Disconected from Module");
       Serial.println("--------------------------------------------------------------");
+
     }
   }
 
+  if (module.newStatusAvailable() || module.newStrikesAvailable()) {
+    printStatus();
+  }
+
+  if (module.newDebugAvailable()) {
+    Serial.print("DEBUG: ");
+    Serial.println(module.getDebugMessage());
+    Serial.println("--------------------------------------------------------------");
+  }
 
 
 
   if (stringComplete) {
     if (inputString == "arm\n") {
-      Wire.beginTransmission(8); // transmit to device #8
-      Wire.write(20);
-      Wire.endTransmission();    // stop transmitting
+      module.arm();
     }
 
     if (inputString == "reset\n") {
-      Wire.beginTransmission(8); // transmit to device #8
-      Wire.write(21);
-      Wire.endTransmission();    // stop transmitting
+      module.reset();
     }
 
     if (inputString == "explode\n") {
-      Wire.beginTransmission(8); // transmit to device #8
-      Wire.write(22);
-      Wire.endTransmission();    // stop transmitting
+      module.explode();
     }
 
     if (inputString == "win\n") {
-      Wire.beginTransmission(8); // transmit to device #8
-      Wire.write(23);
-      Wire.endTransmission();    // stop transmitting
+      module.win();
     }
 
     if (inputString == "getStatus\n") {
-      Serial.println(ktaneCC.receiveStatus(8), BIN);
+      Serial.println(ktaneCC.receiveStatus(address), BIN);
     }
 
     if (inputString == "getConfig\n") {
-      getConfig();
+      Serial.println(ktaneCC.receiveFullConfig(address));
     }
 
     if (inputString == "getError\n") {
-      getError();
+      Serial.println(ktaneCC.receiveErrorMessage(address));
     }
 
     if (inputString == "getDebug\n") {
-      getDebug();
+      Serial.println(ktaneCC.receiveDebugMessage(address));
     }
 
     if (inputString == "getStrikes\n") {
-      getStrikes();
+      Serial.println(ktaneCC.receiveStrikes(address));
     }
 
     if (inputString == "getName\n") {
-      getName();
+      Serial.println(ktaneCC.receiveModuleName(address));
     }
 
     if (inputString == "getVersion\n") {
-      getVersion();
+      Serial.println(ktaneCC.receiveModuleVersion(address));
     }
 
     // clear the string:
     inputString = "";
     stringComplete = false;
   }
+
+
 
 }
 

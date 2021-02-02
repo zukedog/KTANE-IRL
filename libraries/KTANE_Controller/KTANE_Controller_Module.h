@@ -18,6 +18,7 @@ class KTANE_Controller_Module {
     // Module State
     byte status;
     byte lastStatus;
+    byte newStatus;
     int strikes;
     String fullConfig;
     String errorMessage;
@@ -42,6 +43,8 @@ class KTANE_Controller_Module {
     // Constructor
     void begin(int);
     // Get Functions
+    bool getResponding();
+    bool getInitialised();
     bool getGameMode();
     bool getArmed();
     bool getValidConfig();
