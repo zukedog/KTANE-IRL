@@ -8,7 +8,7 @@ KTANE_Controller_Module modules[moduleCount];
 String inputString = "";         // a String to hold incoming data
 bool stringComplete = false;  // whether the string is complete
 const int address = 8;
-String brk = "--------------------------------------------------------------";
+const String brk = "--------------------------------------------------------------";
 void setup() {
   Serial.begin(2000000);  // start serial for output
   ktaneCC.begin();
@@ -26,7 +26,9 @@ void setup() {
 
 
 void printStatus(int moduleNum) {
-  Serial.println("MODULE " +  String(moduleNum) + " STATUS:");
+  Serial.print("MODULE ");
+  Serial.print(moduleNum);
+  Serial.println(" STATUS:");
   Serial.print("GM: ");
   Serial.print(modules[moduleNum].getGameMode());
   Serial.print(", VC/A: ");
@@ -49,12 +51,18 @@ void loop() {
       if (connection[i]) {
         
         Serial.print("Connected to Module ");
-        Serial.println(String(i));
-        Serial.println(brk);
+        Serial.println(i);
+        Serial.print("Name: ");
+        Serial.print(modules[i].getName());
+        //Serial.print("Version: ");
+        //for (int i=0; j<3; i++){
+        //  Serial.println(modules[i].getVersion(j);
+        //}
+        Serial.println();
         printStatus(i);
       } else {
         Serial.print("Disconected from Module ");
-        Serial.println(String(i));
+        Serial.println(i);
         Serial.println(brk);
 
       }
@@ -65,7 +73,9 @@ void loop() {
     }
 
     if (modules[i].newDebugAvailable()) {
-      Serial.print("DEBUG FROM " + String(i) + ": ");
+      Serial.print("DEBUG FROM ");
+      Serial.print(i);
+      Serial.print(": ");
       Serial.println(modules[i].getDebugMessage());
       Serial.println(brk);
     }
@@ -118,8 +128,11 @@ void loop() {
       Serial.println(ktaneCC.receiveStrikes(address));
     }
 
-    if (inputString == "getName\n") {
-      Serial.println(ktaneCC.receiveModuleName(address));
+    if (inputString == "getName:\n") {
+      Serial.print("Name of Module");
+      Serial.print(inputString.substring(7));
+      Serial.print(": ");
+      Serial.println(ktaneCC.receiveModuleName(/*inputString.substring(7).toInt()*/1));
     }
 
     if (inputString == "getVersion\n") {

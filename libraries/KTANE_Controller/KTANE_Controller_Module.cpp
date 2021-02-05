@@ -89,6 +89,10 @@ String KTANE_Controller_Module::getConfig(){
   newConfigOnController = false;
   return fullConfig;
 }
+
+String KTANE_Controller_Module::getName(){
+  return moduleName;
+}
 String KTANE_Controller_Module::getErrorMessage(){
   String returnValue = errorMessage;
   errorMessage == "";
@@ -182,6 +186,10 @@ void KTANE_Controller_Module::updateStateAndStatus(){
   if (newStrikesOnModule()) {
     strikes += ktaneCC.receiveStrikes(address);
     newStrikesOnController = true;
+  }
+  if (initialised == false){
+    moduleName = ktaneCC.receiveModuleName(address);
+    // moduleVersion = ktane.CC.receiveModuleVersion(address);
   }
   initialised = true;
 }

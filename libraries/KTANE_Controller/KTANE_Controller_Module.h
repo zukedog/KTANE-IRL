@@ -49,6 +49,7 @@ class KTANE_Controller_Module {
     bool getArmed();
     bool getValidConfig();
     String getConfig();
+    String getName();
     String getErrorMessage();
     String getDebugMessage();
     int getStrikes();
